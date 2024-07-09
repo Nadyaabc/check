@@ -1,7 +1,9 @@
 package main.java.ru.clevertec.check;
-import main.java.ru.clevertec.check.ElementList;
 import java.io.*;
-import java.util.Calendar;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class CheckRunner {
     public static void main(String[] args) {
@@ -9,6 +11,7 @@ public class CheckRunner {
         int argsLength= args.length;
         String balance, discountCardNumber;
         boolean hasDiscountCard=false;
+
         if (args[argsLength-2].contains("discountCard")){
             hasDiscountCard=true;
             balance=args[argsLength-1];
@@ -18,54 +21,87 @@ public class CheckRunner {
             balance=args[argsLength-1];
             discountCardNumber=null;
         }
-
-        int[]idArray=new int[argsLength-2];
-        int[]quantityArray=new int[argsLength-2];
-
-        for (int i =0; i <argsLength-2;i++)
+//add elements to hashmap
+        HashMap<Integer, Integer> idQty=new HashMap<>();
+        int id;
+        for (int i =0; i<argsLength-2; i++)
         {
-            idArray[i] = Integer.parseInt((args[i].split("-"))[0]);
-            quantityArray[i]=Integer.parseInt((args[i].split("-"))[1]);
-
+            id = Integer.parseInt((args[i].split("-"))[0]);
+            int qty=Integer.parseInt((args[i].split("-"))[1]);
+            idQty.computeIfPresent(id, (a, b)-> b += qty);
+            idQty.computeIfAbsent(id, (a) -> qty);
         }
 
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader("./src/main/resources/products.csv"));
+        double total=0, totalDiscount=0, totalWithDiscount=0;
+
+        //current date and time
+        Calendar c = Calendar.getInstance();
+        String currentTime = (String.format("%02d",  c.get(Calendar.HOUR_OF_DAY)))  + ":" +
+                String.format("%02d",  c.get(Calendar.MINUTE)) + ":" +
+                String.format("%02d",  c.get(Calendar.SECOND));
+        String currentDate = (String.format("%02d",  c.get(Calendar.DAY_OF_MONTH)))  + "." +
+                String.format("%02d",  c.get(Calendar.MONTH)) + "." +
+                String.format("%02d",  c.get(Calendar.YEAR));
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter("src/result1.csv"))){
+           //  BufferedReader reader = new BufferedReader(new FileReader(""));
+            writer.write("Date;Time\n");
+            writer.write(currentDate + ";" + currentTime + "\n");
+            writer.write("\nQTY;DESCRIPTION;PRICE;DISCOUNT;TOTAL\n");
+            List<String>lines = Files.readAllLines(Paths.get("./src/main/resources/products.csv"));
+            Set<Integer> keys =idQty.keySet();
+            for (Integer key : keys) {
+                for (String line : lines) {
+                    String[] splitLine = line.split(";");
+                    if (splitLine[0].equals(key.toString())) {
+                        writer.write(idQty.get(Integer.parseInt(splitLine[0])) + ";" + splitLine[1] + ";" + splitLine[2]);
+                        writer.write("\n");
+                    }
+                }
+            }
+            System.out.println("Data successfully written to the file.");
+
+/*
             String line = reader.readLine();
+            line = reader.readLine();
             while (line != null) {
                 String[] values = line.split(";");
-                for (int i = 0; i < 4;i++)
+                for (int i = 0; i < 5;i++)
                 {
-                //    System.out.println(values[i]);
+                    idQty.forEach((a,b) -> {
+
+                    });
                 }
                 line = reader.readLine();
 
             }
-            reader.close();
+            reader.close();*/
         }
         catch (IOException e)
-        {
+        {System.out.println("Error writing data to the file: " + e.getMessage());
             e.printStackTrace();
         }
-        CheckElement ch = new CheckElement(1, 6);
-        ElementList elementList = new ElementList();
-        elementList.add(ch);
+
+
+
+
+
+
+
+
+
+
+
+
+
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("src/result.csv"));
             //current date and time
-            Calendar c = Calendar.getInstance();
-            String currentTime = (String.format("%02d",  c.get(Calendar.HOUR_OF_DAY)))  + ":" +
-                    String.format("%02d",  c.get(Calendar.MINUTE)) + ":" +
-                    String.format("%02d",  c.get(Calendar.SECOND));
-            String currentDate = (String.format("%02d",  c.get(Calendar.DAY_OF_MONTH)))  + "." +
-                    String.format("%02d",  c.get(Calendar.MONTH)) + "." +
-                    String.format("%02d",  c.get(Calendar.YEAR));
-/*
-            writer.write("Date;Time\n");
-            writer.write(currentDate + ";" + currentTime + "\n");
-            writer.write("\nQTY;DESCRIPTION;PRICE;DISCOUNT;TOTAL\n");
+
+
+
             //TODO
-            writer.write("\nDISCOUNT CARD;DISCOUNT PERCENTAGE\n");
+    /*        writer.write("\nDISCOUNT CARD;DISCOUNT PERCENTAGE\n");
             //TODO
             writer.write("\nTOTAL PRICE;TOTAL DISCOUNT;TOTAL WITH DISCOUNT\n");
             //TODO
@@ -78,7 +114,6 @@ public class CheckRunner {
         {
             //e.printStackTrace();
         }
-
 
     }
 }
