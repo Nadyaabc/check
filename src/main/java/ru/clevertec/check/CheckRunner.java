@@ -139,6 +139,7 @@ public class CheckRunner {
             writer.write("Date;Time\n");
             writer.write(currentDate + ";" + currentTime + "\n");
             writer.write("\nQTY;DESCRIPTION;PRICE;DISCOUNT;TOTAL\n");
+            System.out.print("Date;Time\n"+ currentDate + ";" + currentTime + "\n"+"\nQTY;DESCRIPTION;PRICE;DISCOUNT;TOTAL\n");
             NumberFormat nf = NumberFormat.getInstance(Locale.FRANCE);
             List<String>linesProducts = Files.readAllLines(Paths.get("./src/main/resources/products.csv"));
             linesProducts.removeFirst();
@@ -154,21 +155,26 @@ public class CheckRunner {
                         price = nf.parse(splitLine[2]).doubleValue();
 
                         if (quantityAvailable<quantityRequested) throw new Exception("Not enough items in stock");
-
                         writer.write(quantityRequested + ";" + splitLine[1] + ";" + String.format("%.02f", price)+"$;");
+                        System.out.print(quantityRequested + ";" + splitLine[1] + ";" + String.format("%.02f", price)+"$;");
                         if (quantityRequested>4 && splitLine[4].equals("+")){
                             writer.write(String.format("%.02f", quantityRequested*price*wholesaleDiscount)+"$;");
                             writer.write(String.format("%.02f", quantityRequested*price)+"$;");
+                            System.out.print(String.format("%.02f", quantityRequested*price*wholesaleDiscount)+"$;"+String.format("%.02f", quantityRequested*price)+"$;");
                             totalDiscount += quantityRequested*price*wholesaleDiscount;
-                            total += quantityRequested*price;
                         }
                         else {
-                            writer.write(String.format("%.02f", quantityRequested*price*discount/100)+"$;");
-                            writer.write(String.format("%.02f", quantityRequested*price)+"$;");
+                            String s = String.format("%.02f", quantityRequested * price * discount / 100)+"$;";
+                            writer.write(s);
+                            System.out.print(s);
+                            s=String.format("%.02f", quantityRequested*price)+"$;";
+                            writer.write(s);
+                            System.out.print(s);
                             totalDiscount+=quantityRequested*price*discount/100;
-                            total+=quantityRequested*price;
                         }
+                        total += quantityRequested*price;
                         writer.write("\n");
+                        System.out.println();
                     }
                 }
             }
@@ -192,10 +198,15 @@ public class CheckRunner {
             {
                 writer.write("\nDISCOUNT CARD;DISCOUNT PERCENTAGE\n");
                 writer.write(discountCardNumber+";"+discount+"%"+"\n");
+                System.out.print("\nDISCOUNT CARD;DISCOUNT PERCENTAGE\n");
+                System.out.print(discountCardNumber+";"+discount+"%"+"\n");
             }
 
             writer.write("\nTOTAL PRICE;TOTAL DISCOUNT;TOTAL WITH DISCOUNT\n");
-            writer.write(total+"$;"+String.format("%.02f",totalDiscount)+"$;"+String.format("%.02f",totalWithDiscount)+"$");
+            String s = String.format("%.02f", total) + "$;" + String.format("%.02f", totalDiscount) + "$;" + String.format("%.02f", totalWithDiscount) + "$";
+            writer.write(s);
+            System.out.print("\nTOTAL PRICE;TOTAL DISCOUNT;TOTAL WITH DISCOUNT\n");
+            System.out.print(s);
         }
         catch (IOException e)
         {
