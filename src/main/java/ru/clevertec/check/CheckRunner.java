@@ -22,7 +22,6 @@ public class CheckRunner {
             if (argsLength == 2) {
                 balanceString = args[1];
                 if (!(balanceString.matches("balanceDebitCard=(-)?\\d+(.\\d{2})?") && args[0].matches("\\d+-\\d+"))) {
-                    System.out.println(0);
                     throw new IllegalArgumentException();
                 } else {
                     balance = Double.parseDouble(balanceString.split("=")[1]);
@@ -34,13 +33,11 @@ public class CheckRunner {
 
                 //check if balance is valid
                 if (!balanceString.matches("balanceDebitCard=(-)?\\d+(.\\d{2})?")) {
-                    System.out.println("1");
                     throw new IllegalArgumentException();
                 }
 
                 //check if args[length-2] valid
                 if (!(args[argsLength - 2].matches("\\d+-\\d+") || args[argsLength - 2].matches("discountCard=\\d{4}"))) {
-                    System.out.println(2);
                     throw new IllegalArgumentException();
                 } else {
                     balance = Double.parseDouble(balanceString.split("=")[1]);
@@ -50,10 +47,11 @@ public class CheckRunner {
                     }
                 }
             }
-            //System.out.println("Balance: "+ balance + " dcn: " + discountCardNumber);
+
         } catch (IllegalArgumentException e) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/result.csv"))) {
-                System.out.println("ERROR\nBAD REQUEST");
+                System.out.println("ERROR\nBAD REQUEST\nIt seems that you made a mistake with your request.");
+                System.out.println("---Example: java -cp ./src/main/java/ru/clevertec/check/CheckRunner 3-1 2-5 5-1 discountCard=1111 balanceDebitCard=100.10");
                 writer.write("ERROR\nBAD REQUEST");
             } catch (IOException ee) {
                 System.out.println("RESULT.CSV ERROR");
@@ -80,6 +78,7 @@ public class CheckRunner {
             } catch (Exception e) {
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/result.csv"))) {
                     System.out.println("ERROR\nBAD REQUEST");
+                    System.out.println("It seems that your discount card number is wrong");
                     writer.write("ERROR\nBAD REQUEST");
                 } catch (IOException ee) {
                     System.out.println("RESULT.CSV ERROR");
@@ -141,7 +140,7 @@ public class CheckRunner {
                         quantityAvailable = Integer.parseInt(splitLine[3]);
                         price = nf.parse(splitLine[2]).doubleValue();
 
-                        if (quantityAvailable < quantityRequested) throw new Exception("Not enough items in stock");
+                        if (quantityAvailable < quantityRequested) throw new Exception();
                         writer.write(quantityRequested + ";" + splitLine[1] + ";" + String.format("%.02f", price) + "$;");
                         System.out.print(quantityRequested + ";" + splitLine[1] + ";" + String.format("%.02f", price) + "$;");
                         if (quantityRequested > 4 && splitLine[4].equals("+")) {
@@ -169,7 +168,7 @@ public class CheckRunner {
                 if (totalWithDiscount > balance) throw new Exception();
             } catch (Exception e) {
                 try (BufferedWriter writer1 = new BufferedWriter(new FileWriter("src/result.csv"))) {
-                    System.out.println("ERROR\nNOT ENOUGH MONEY");
+                    System.out.println("\nCANCELLED. \nSorry, your balance is not enough");
                     writer1.write("ERROR\nNOT ENOUGH MONEY");
                 } catch (IOException ee) {
                     System.out.println("RESULT.CSV ERROR");
@@ -193,13 +192,13 @@ public class CheckRunner {
             System.out.println("INTERNAL SERVER ERROR");
         } catch (Exception e) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/result.csv"))) {
-                System.out.println("ERROR\nBAD REQUEST1" + e.getMessage());
+                System.out.println("\nERROR\nBAD REQUEST");
+                System.out.println("We don't have enough items in stock");
                 writer.write("ERROR\nBAD REQUEST");
             } catch (IOException ee) {
                 System.out.println("RESULT.CSV ERROR");
             }
             System.exit(1);
         }
-
     }
 }
