@@ -13,7 +13,11 @@ The check contains a list of products, their amount and price, and, if a buyer h
 
 2. Open your command-line interface and navigate to the project directory.
 
-`cd check-runner`
+`cd check`
+
+3.Compile your file
+
+`javac src/main/java/ru/clevertec/check/CheckRunner.java`
 
 ## HOW TO USE
 To run the program, use the following command:
@@ -29,7 +33,7 @@ where
 
 `balanceDebitCard=xxxx` - the balance on the debit card, a floating-point number with or without decimal places.
 ### example
-`java -cp ./src/main/java ru.clevertec.check.CheckRunner 3-1 2-5 5-1 discountCard=1111 balanceDebitCard=100`
+`java -cp ./src/main/java/ru/clevertec/check/CheckRunner 3-1 2-5 5-1 discountCard=1111 balanceDebitCard=100`
 
 ## IMPORTANT 
 * All arguments should be separated by spaces.
