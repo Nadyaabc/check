@@ -8,14 +8,12 @@ The check contains a list of products, their amount and price, and, if a buyer h
 
 ## HOW TO START
 1. Clone the repository or download the source code files to your local machine.
-2. 
+
 `git clone https://github.com/Nadyaabc/check.git`
+
 2. Open your command-line interface and navigate to the project directory.
 
 `cd check-runner`
-3. Compile the Java source code.
-
-`javac ./src/main/java/ru/clevertec/check/CheckRunner.java`
 
 ## HOW TO USE
 To run the program, use the following command:
